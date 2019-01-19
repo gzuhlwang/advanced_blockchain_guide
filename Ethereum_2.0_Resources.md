@@ -12,11 +12,26 @@
 
 ## Articles
 
+- Darren Langley, [Ethereum 2.0](https://medium.com/rocket-pool/ethereum-2-0-76d0c8a76605), 2018.08.08, RocketPool.
+
 - Ben Edgington, [State of Ethereum Protocol #2: The Beacon Chain](https://media.consensys.net/state-of-ethereum-protocol-2-the-beacon-chain-c6b6a9a69129), 2018.10.27, PegaSys.
 
-- Bruno Škvorc, [The Beacon Chain](https://github.com/status-im/the-explainers/blob/master/authors/swader/03-beacon-chain/en_US/final.md), 2018.11.28, Status / Nimbus.
+- Bruno Škvorc, [The Beacon Chain](https://github.com/status-im/the-explainers/blob/master/authors/swader/03-beacon-chain/en_US/final.md), 2018.11.28, Status/Nimbus.
+
+- Kimi, [Whats New in Ethereum Serenity(2.0)](https://kimiwublog.blogspot.com/2018/12/whats-new-in-ethereum-serenity-20.html), 2018.12.06.
+
+- James Prestwich, [What to Expect When ETH’s Expecting](https://hackernoon.com/what-to-expect-when-eths-expecting-80cb4951afcd), 2019.01.15.
+
+  > VB在twitter上力挺该文,VB对本文的[comments](https://www.reddit.com/r/ethereum/comments/agcrcb/what_to_expect_when_eths_expecting_hacker_noon/ee64r3n/)
+
+- Ben Edgington, [Exploring Ethereum 2.0 Design Goals](https://media.consensys.net/exploring-the-ethereum-2-0-design-goals-fd2d901b4c01), 2019.01.18, PegaSys.探究以太坊2.0设计目标
 
 
 ## Tools
 
 - https://beta.observablehq.com/@cdetrio/shasper-viz-0-4
+
+## Podcasts
+
+Danny Ryan, [Casper+Sharding](https://thebitcoinpodcast.libsyn.com/hashing-it-out-22-caspersharding-danny-ryan), 2018.09.13, Ethereum
+
