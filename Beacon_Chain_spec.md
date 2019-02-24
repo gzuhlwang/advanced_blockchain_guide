@@ -92,4 +92,385 @@
 | INCLUDER_REWARD_QUOTIENT      | 2**3(= 8)           |
 | INACTIVITY_PENALTY_QUOTIENT   | 2**64(= 16,777,216) |
 
+### 状态标记
+
+| 名称(Name)     | 值(Value)    |
+| -------------- | ------------ |
+| INITIATED_EXIT | 2**0 （=1）  |
+| WITHDRAWABLE   | 2**1    (=2) |
+
+### 每块最大运算(Max operations per block)
+
+| 名称(Name)             | 值(Value)   |
+| ---------------------- | ----------- |
+| MAX_PROPOSER_SLASHINGS | 2**4 (=16)  |
+| MAX_ATTESTER_SLASHINGS | 2**0 (=1)   |
+| MAX_ATTESTATIONS       | 2**7 (=128) |
+| MAX_DEPOSITS           | 2**4 (=16)  |
+| MAX_EXITS              | 2**4 (=16)  |
+
+签名域
+
+| 名称(Name)         | 值(Value) |
+| ------------------ | --------- |
+| DOMAIN_DEPOSIT     | 0         |
+| DOMAIN_ATTESTATION | 1         |
+| DOMAIN_PROPOSAL    | 2         |
+| DOMAIN_EXIT        | 3         |
+| DOMAIN_RANDAO      | 4         |
+
 > 上述这些参数可以在shared/params/config.go文件中找到。
+
+## 数据结构
+
+下列的数据结构被定义为[SimpleSerialize(SSZ)](https://github.com/ethereum/eth2.0-specs/blob/master/specs/simple-serialize.md)对象。
+
+### Beacon chain操作
+
+Proposer slashings(不妨翻译为罚没提案者,这是beacon chain的一个操作)
+
+`ProposerSlashing`(这是数据结构)
+
+```
+{
+    # Proposer index  
+    'proposer_index': 'uint64',
+    # First proposal data 
+    'proposal_data_1': ProposalSignedData,
+    # First proposal signature
+    'proposal_signature_1': 'bytes96',
+    # Second proposal data
+    'proposal_data_2': ProposalSignedData,
+    # Second proposal signature
+    'proposal_signature_2': 'bytes96',
+}
+```
+
+[笔者注]：该结构有两个相同类型的变量proposal_data_1和proposal_data_2，它们都属于ProposalSignedData类型。
+
+Attester slashings(不妨翻译为罚没证明人，这是beacon chain的一个操作)
+
+`AttesterSlashings`(这是数据结构)
+
+```
+{
+    # First slashable attestation
+    'slashable_attestation_1': SlashableAttestation,
+    # Second slashable attestation
+    'slashable_attestation_2': SlashableAttestation,
+}
+```
+
+[笔者注]：该结构中有两个相同类型的变量slashable_attestation_1和slashable_attestation_2，它们都属于SlashableAttestation类型。
+
+`SlashableAttestation`(这是数据结构，可罚没的证明，即double vote或surround vote)
+
+```
+{
+    # Validator indices  验证者序号
+    'validator_indices': ['uint64'],
+    # Attestation data   证明数据
+    'data': AttestationData,
+    # Custody bitfield
+    'custody_bitfield': 'bytes',
+    # Aggregate signature
+    'aggregate_signature': 'bytes96',
+}
+```
+
+Attestations(这是一个操作)
+
+`Attestation`(这是一个数据结构)
+
+```
+{
+    # Attester aggregation bitfield
+    'aggregation_bitfield': 'bytes',
+    # Attestation data
+    'data': AttestationData,
+    # Custody bitfield
+    'custody_bitfield': 'bytes',
+    # BLS aggregate signature
+    'aggregate_signature': 'bytes96',
+}
+```
+
+`AttestationData`(这是数据结构，就是casper ffg论文中的vote消息)
+
+```
+{
+    # Slot number   信标链区块号
+    'slot': 'uint64', 
+    # Shard number  分片序号
+    'shard': 'uint64',
+    # Hash of root of the signed beacon block  
+    'beacon_block_root': 'bytes32',
+    # Hash of root of the ancestor at the epoch boundary
+    'epoch_boundary_root': 'bytes32',
+    # Shard block's hash of root
+    'shard_block_root': 'bytes32',
+    # Last crosslink's hash of root
+    'latest_crosslink_root': 'bytes32',
+    # Last justified epoch in the beacon state  信标链中上一个justified的epoch
+    'justified_epoch': 'uint64',
+    # Hash of the last justified beacon block
+    'justified_block_root': 'bytes32',
+}
+```
+
+##### `AttestationDataAndCustodyBit`
+
+```
+{
+    # Attestation data
+    'data': AttestationData,
+    # Custody bit
+    'custody_bit': 'bool',
+}
+```
+
+Deposit(这是一个操作)
+
+`Deposit`
+
+```
+{
+    # Branch in the deposit tree  分支
+    'branch': ['bytes32'],
+    # Index in the deposit tree   树中的位置
+    'index': 'uint64',
+    # Data                        充值数组
+    'deposit_data': DepositData,
+}
+```
+
+`DepositData`
+
+```
+{
+    # Amount in Gwei
+    'amount': 'uint64',
+    # Timestamp from deposit contract
+    'timestamp': 'uint64',
+    # Deposit input
+    'deposit_input': DepositInput,
+}
+```
+
+`DepositInput`
+
+```
+{
+    # BLS pubkey
+    'pubkey': 'bytes48',
+    # Withdrawal credentials    提现凭证
+    'withdrawal_credentials': 'bytes32',
+    # A BLS signature of this `DepositInput`
+    'proof_of_possession': 'bytes96',
+}
+```
+
+Exits(这是一个操作)
+
+`Exit`
+
+```
+{
+    # Minimum epoch for processing exit
+    'epoch': 'uint64',
+    # Index of the exiting validator
+    'validator_index': 'uint64',
+    # Validator signature
+    'signature': 'bytes96',
+}
+```
+
+### 信标链区块(Beacon chain blocks)
+
+#### `BeaconBlock`
+
+```
+{
+    ## Header ##
+    'slot': 'uint64',
+    'parent_root': 'bytes32',
+    'state_root': 'bytes32',
+    'randao_reveal': 'bytes96',
+    'eth1_data': Eth1Data,
+    'signature': 'bytes96',
+
+    ## Body ##
+    'body': BeaconBlockBody,
+}
+```
+
+#### `BeaconBlockBody`
+
+```
+{
+    'proposer_slashings': [ProposerSlashing],
+    'attester_slashings': [AttesterSlashing],
+    'attestations': [Attestation],
+    'deposits': [Deposit],
+    'exits': [Exit],
+}
+```
+
+#### `ProposalSignedData`
+
+```
+{
+    # Slot number
+    'slot': 'uint64',
+    # Shard number (`BEACON_CHAIN_SHARD_NUMBER` for beacon chain)
+    'shard': 'uint64',
+    # Block's hash of root
+    'block_root': 'bytes32',
+}
+```
+
+### Beacon chain state
+
+#### `BeaconState`
+
+```
+{
+    # Misc
+    'slot': 'uint64',
+    'genesis_time': 'uint64',
+    'fork': Fork,  # For versioning hard forks
+
+    # Validator registry
+    'validator_registry': [Validator],
+    'validator_balances': ['uint64'],
+    'validator_registry_update_epoch': 'uint64',
+
+    # Randomness and committees
+    'latest_randao_mixes': ['bytes32'],
+    'previous_epoch_start_shard': 'uint64',
+    'current_epoch_start_shard': 'uint64',
+    'previous_calculation_epoch': 'uint64',
+    'current_calculation_epoch': 'uint64',
+    'previous_epoch_seed': 'bytes32',
+    'current_epoch_seed': 'bytes32',
+
+    # Finality
+    'previous_justified_epoch': 'uint64',
+    'justified_epoch': 'uint64',
+    'justification_bitfield': 'uint64',
+    'finalized_epoch': 'uint64',
+
+    # Recent state
+    'latest_crosslinks': [Crosslink],
+    'latest_block_roots': ['bytes32'],
+    'latest_index_roots': ['bytes32'],
+    'latest_penalized_balances': ['uint64'],  # Balances penalized at every withdrawal period
+    'latest_attestations': [PendingAttestation],
+    'batched_block_roots': ['bytes32'],
+
+    # Ethereum 1.0 chain data
+    'latest_eth1_data': Eth1Data,
+    'eth1_data_votes': [Eth1DataVote],
+}
+```
+
+#### `Validator`
+
+```
+{
+    # BLS public key
+    'pubkey': 'bytes48',
+    # Withdrawal credentials
+    'withdrawal_credentials': 'bytes32',
+    # Epoch when validator activated
+    'activation_epoch': 'uint64',
+    # Epoch when validator exited
+    'exit_epoch': 'uint64',
+    # Epoch when validator withdrew
+    'withdrawal_epoch': 'uint64',
+    # Epoch when validator was penalized
+    'penalized_epoch': 'uint64',
+    # Status flags
+    'status_flags': 'uint64',
+}
+```
+
+#### `Crosslink`
+
+```
+{
+    # Epoch number
+    'epoch': 'uint64',
+    # Shard block root
+    'shard_block_root': 'bytes32',
+}
+```
+
+#### `PendingAttestation`
+
+```
+{
+    # Attester aggregation bitfield
+    'aggregation_bitfield': 'bytes',
+    # Attestation data
+    'data': AttestationData,
+    # Custody bitfield
+    'custody_bitfield': 'bytes',
+    # Inclusion slot
+    'inclusion_slot': 'uint64',
+}
+```
+
+#### `Fork`
+
+```
+{
+    # Previous fork version
+    'previous_version': 'uint64',
+    # Current fork version
+    'current_version': 'uint64',
+    # Fork epoch number
+    'epoch': 'uint64',
+}
+```
+
+#### `Eth1Data`
+
+```
+{
+    # Root of the deposit tree
+    'deposit_root': 'bytes32',
+    # Block hash  ETH1.0的块hash
+    'block_hash': 'bytes32',
+}
+```
+
+#### `Eth1DataVote`
+
+```
+{
+    # Data being voted for
+    'eth1_data': Eth1Data,
+    # Vote count
+    'vote_count': 'uint64',
+}
+```
+
+## 自定义类型(custom types)
+
+我们定义下列的Python版自定义类型以便类型提示和可读性。
+
+| 名称(Name)       | SSZ equivalent | 描述(Description)                  |
+| ---------------- | -------------- | ---------------------------------- |
+| `SlotNumber`     | `uint64`       | a slot number                      |
+| `EpochNumber`    | `uint64`       | an epoch number                    |
+| `ShardNumber`    | `uint64`       | a shard number                     |
+| `ValidatorIndex` | `uint64`       | an index in the validator registry |
+| `Gwei`           | `uint64`       | an amount in Gwei                  |
+| `Bytes32`        | `bytes32`      | 32 bytes of binary data            |
+| `BLSPubkey`      | `bytes48`      | a BLS public key                   |
+| `BLSSignature`   | `bytes96`      | a BLS signature                    |
+
+辅助函数
+
+### `hash`

@@ -26,6 +26,8 @@
 
 - Ben Edgington, [Exploring Ethereum 2.0 Design Goals](https://media.consensys.net/exploring-the-ethereum-2-0-design-goals-fd2d901b4c01), 2019.01.18, PegaSys.探究以太坊2.0设计目标
 
+- 
+
 
 ## Tools
 
