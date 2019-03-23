@@ -17,38 +17,38 @@
 ## 术语
 
 - Validator——Casper/Sharding共识系统的一名参与者(participant)。您可以通过充值32ETH到Casper机制成为一名validotor。
-- Active validator——当前参与协议的一名validator，Casper机制期待活跃的验证者创建block和证明(attest)区块，crosslink以及其他的共识对象。
-- Committee——[活跃验证者]()中(伪)随机抽样的一个子集。当一个委员会(committe)被集体提及时，如“该委员会证明X”，这被假定为“该委员会的某个子集包含足够的[验证者]()，协议认可其代表委员会”。
+- Active validator——当前参与协议的一名validator，Casper机制期待活跃的验证者创建block和证明(attest)区块，对crosslink以及其他的共识对象进行投票。
+- Committee——[活跃验证者]()中(伪)随机抽样的一个子集。当一个委员会(committe)被集体提及时，如“该委员会证明X”，这被假定为“该委员会的某个子集包含足够的[验证者]()，协议认可其代表委员会”。【笔者注：超过2/3的voting power的验证者们】
 - Proposer——创建一个信标链block的[验证者]()。
 - Attester——一名验证者，委员会的一员，需要对信标链的block上进行签名，同时创建到特定分片链(shard chain)上的最近的分片block的一个link(crosslink)。
 - Beacon chain——核心的PoS链，分片系统的基础(base)。
 - Shard chain——用户交易发生和存储账户数据的许多链的一个。
 - Block root——信标链block或分片block中32字节的默克尔根。以前称为“block hash”。
 - Crosslink——来自委员会的一组签名，证明分片链中的一个block可以包含在信标链中，Crosslink是信标链“了解”分片链更新状态的主要手段。
-- Slot——一段SLOT_DURATIONS秒，在此期间，一个提案者能够创建信标链block以及一些attesters有能力进行证明(attestation)。
-- Epoch——
+- Slot——一段SLOT_DURATIONS秒，在此期间，一个提案者能够创建信标链block以及一些attesters有能力进行证明(attestation)。【笔者注：类似eth1.0中的block number】
+- Epoch——对齐slot的一段时间，在这期间所有的验证人只有一次机会做出attestation。【笔者注：attestation可以视作投票(vote)】
 - Finalized，justified——参见Casper FFG终局化[casper-ffg]。
 - Withdrawal period——一名验证者退出和该验证者余额可被提现的时隙(slot)数。
-- Genesis time——在时隙0，创世信标链区块的Unix时间。
+- Genesis time——在时隙0，创世信标链区块的Unix时间戳。
 
 ## 常数
 
 ### Misc
 
-| 名称(Name)                   | 值(Value)     | 单位(Unit)   |
-| ---------------------------- | ------------- | ------------ |
-| SHARD_COUNT                  | 2**10(=1,024) | shards       |
-| TARGET_COMMITTEE_SIZE        | 3**7(=128)    | validators   |
-| EJECTION_BALANCE             | 2**4(=16)     | ETH          |
-| MAX_BALANCE_CHURN_QUOTIENT   | 2**5(=32)     | -            |
-| GWEI_PER_ETH                 | 10**9         | Gwei/ETH     |
-| BEACON_CHAIN_SHARD_NUMBER    | 2**64-1       | -            |
-| MAX_CAPSER_VOTES             | 2**10(=1,024) | votes        |
-| LATEST_BLOCK_ROOTS_LENGTH    | 2**13(=8,192) | block roots  |
-| LATEST_RANDAO_MIXES_LENGTH   | 2**13(=8192)  | randao mixes |
-| LATEST_PENALIZED_EXIT_LENGTH | 2**13(=8,192) | epochs       |
+| 名称(Name)                   | 值(Value)      | 单位(Unit)   |
+| ---------------------------- | -------------- | ------------ |
+| SHARD_COUNT                  | 2**10(= 1,024) | shards       |
+| TARGET_COMMITTEE_SIZE        | 3**7(= 128)    | validators   |
+| EJECTION_BALANCE             | 2**4(=16)      | ETH          |
+| MAX_BALANCE_CHURN_QUOTIENT   | 2**5(= 32)     | -            |
+| GWEI_PER_ETH                 | 10**9          | Gwei/ETH     |
+| BEACON_CHAIN_SHARD_NUMBER    | 2**64-1        | -            |
+| MAX_CAPSER_VOTES             | 2**10(= 1,024) | votes        |
+| LATEST_BLOCK_ROOTS_LENGTH    | 2**13(= 8,192) | block roots  |
+| LATEST_RANDAO_MIXES_LENGTH   | 2**13(= 8192)  | randao mixes |
+| LATEST_PENALIZED_EXIT_LENGTH | 2**13(= 8,192) | epochs       |
 
-为了crosslinks的安全性，TARGET_COMMITTEE_SIZE超过了推荐的最先委员会大小111。有了充足的活跃验证者(至少EPOCH_LENGTH*TARGET_COMMITTEE_SIZE)，混洗算法保证委员会大小至少TARGET_COMMITTEE_SIZE。（无偏的随机性将改进委员会的鲁棒性并降低最小安全委员会大小）。
+为了crosslinks的安全性，`TARGET_COMMITTEE_SIZE`超过了[建议的最小委员会大小111](https://vitalik.ca/files/Ithaca201807_Sharding.pdf)。有了足够的活跃验证者(至少`EPOCH_LENGTH * TARGET_COMMITTEE_SIZE`)，混洗算法(shuffling algorithm)保证委员会规模至少为`TARGET_COMMITTEE_SIZE`。（可验证延迟函数(VDF)具有的无偏随机性将改进委员会的鲁棒性并降低安全的最小安全委员会规模）。
 
 ### 充值合约(Deposit contract)
 
@@ -73,21 +73,21 @@
 
 ### 时间参数
 
-| 名称(Name)                       | 值(Value)      | 单位(Unit) | 持续时间(Duration) |
-| -------------------------------- | -------------- | ---------- | ------------------ |
-| SLOT_DURATION                    | 6              | seconds    | 6 seconds          |
-| MIN_ATTESTATION_INCLUSTION_DELAY | 2**2(=4)       | slots      | 24 seconds         |
-| EPOCH_LENGTH                     | 2**6(=64)      | slots      | 6.4 minutes        |
-| SEED_LOOKHEAD                    | 2**6(=64)      | slots      | 6.4 minutes        |
-| ENTRY_EXIT_DELAY                 | 2**8(=256)     | slots      | 25.6 minutes       |
-| DEPOSIT_ROOT_VOTING_PERIOD       | 2**10(=1,024)  | slots      | ~ 1.7 hours        |
-| MIN_VALIDATOR_WITHDRAWL_TIME     | 2**14(=16,384) | slots      | ~ 27 hours         |
+| 名称(Name)                       | 值(Value)       | 单位(Unit) | 持续时间(Duration) |
+| -------------------------------- | --------------- | ---------- | ------------------ |
+| SLOT_DURATION                    | 6               | seconds    | 6 seconds          |
+| MIN_ATTESTATION_INCLUSTION_DELAY | 2**2(= 4)       | slots      | 24 seconds         |
+| EPOCH_LENGTH                     | 2**6(= 64)      | slots      | 6.4 minutes        |
+| SEED_LOOKAHEAD                   | 2**6(= 64)      | slots      | 6.4 minutes        |
+| ENTRY_EXIT_DELAY                 | 2**8(= 256)     | slots      | 25.6 minutes       |
+| DEPOSIT_ROOT_VOTING_PERIOD       | 2**10(= 1,024)  | slots      | ~ 1.7 hours        |
+| MIN_VALIDATOR_WITHDRAWL_TIME     | 2**14(= 16,384) | slots      | ~ 27 hours         |
 
 ### 奖惩指数
 
 | 名称(Name)                    | 值(Value)           |
 | ----------------------------- | ------------------- |
-| BASE_REWARD_QUOTIENT          | 2**10(=1,024)       |
+| BASE_REWARD_QUOTIENT          | 2**5(= 32)          |
 | WHISTLEBLOWER_REWARD_QUOTIENT | 2**9 (= 512)        |
 | INCLUDER_REWARD_QUOTIENT      | 2**3(= 8)           |
 | INACTIVITY_PENALTY_QUOTIENT   | 2**64(= 16,777,216) |
@@ -101,15 +101,15 @@
 
 ### 每块最大运算(Max operations per block)
 
-| 名称(Name)             | 值(Value)   |
-| ---------------------- | ----------- |
-| MAX_PROPOSER_SLASHINGS | 2**4 (=16)  |
-| MAX_ATTESTER_SLASHINGS | 2**0 (=1)   |
-| MAX_ATTESTATIONS       | 2**7 (=128) |
-| MAX_DEPOSITS           | 2**4 (=16)  |
-| MAX_EXITS              | 2**4 (=16)  |
+| 名称(Name)             | 值(Value)    |
+| ---------------------- | ------------ |
+| MAX_PROPOSER_SLASHINGS | 2**4 (= 16)  |
+| MAX_ATTESTER_SLASHINGS | 2**0 (= 1)   |
+| MAX_ATTESTATIONS       | 2**7 (= 128) |
+| MAX_DEPOSITS           | 2**4 (= 16)  |
+| MAX_EXITS              | 2**4 (= 16)  |
 
-签名域
+### 签名域
 
 | 名称(Name)         | 值(Value) |
 | ------------------ | --------- |
@@ -281,6 +281,27 @@ Exits(这是一个操作)
     # Index of the exiting validator
     'validator_index': 'uint64',
     # Validator signature
+    'signature': 'bytes96',
+}
+```
+
+`Transfer`
+
+```
+{
+    # Sender index
+    'sender': 'uint64',
+    # Recipient index
+    'recipient': 'uint64',
+    # Amount in Gwei
+    'amount': 'uint64',
+    # Fee in Gwei for block proposer
+    'fee': 'uint64',
+    # Inclusion slot
+    'slot': 'uint64',
+    # Sender withdrawal pubkey
+    'pubkey': 'bytes48',
+    # Sender signature
     'signature': 'bytes96',
 }
 ```
@@ -468,8 +489,8 @@ Exits(这是一个操作)
 | `ValidatorIndex` | `uint64`       | an index in the validator registry |
 | `Gwei`           | `uint64`       | an amount in Gwei                  |
 | `Bytes32`        | `bytes32`      | 32 bytes of binary data            |
-| `BLSPubkey`      | `bytes48`      | a BLS public key                   |
-| `BLSSignature`   | `bytes96`      | a BLS signature                    |
+| `BLSPubkey`      | `bytes48`      | a BLS12-381 public key             |
+| `BLSSignature`   | `bytes96`      | a BLS12-381 signature              |
 
 辅助函数
 
