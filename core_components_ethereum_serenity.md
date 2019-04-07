@@ -18,7 +18,13 @@ ethresear上有关[BLS聚合签名讨论](https://ethresear.ch/t/pragmatic-signa
 
 3 分叉选择规则[LMD-GHOST](https://vitalik.ca/general/2018/12/05/cbc_casper.html#lmd-ghost)
 
+bitwise lmd ghost:https://ethresear.ch/t/bitwise-lmd-ghost/4749/5
+
+Bitwise LMD GHOST: An efficient CBC Casper fork choice rule：https://medium.com/@aditya.asgaonkar/bitwise-lmd-ghost-an-efficient-cbc-casper-fork-choice-rule-6db924e57d1f
+
 不同lmd ghost实现[lmd-ghost](https://github.com/protolambda/lmd-ghost)
+
+
 
 4 [Randao](https://github.com/randao/randao)
 
@@ -26,7 +32,9 @@ ethresear上有关[BLS聚合签名讨论](https://ethresear.ch/t/pragmatic-signa
 
 5 Casper ffg
 
-Voting，justification，finalization，dinasty changes，slashing等等
+Voting,justification,finalization,dinasty changes,slashing等等
+
+- Terence Tsao. Casper the friendly Finality Gadget, [slide](https://docs.google.com/presentation/d/1epLg2hg-dluPqen1x3iMj5mnRjyiE2XoNtzk6r96Je0/mobilepresent?slide=id.g50c842b778_0_0), 2019.04, Prysmatic Labs.
 
 6 序列化方法[SimpleSerialize (SSZ) ](https://github.com/ethereum/eth2.0-specs/blob/master/specs/simple-serialize.md)
 
@@ -46,4 +54,6 @@ https://github.com/ethereum/eth2.0-specs/blob/master/specs/core/0_beacon-chain.m
 
 https://github.com/ethereum/eth2.0-specs/blob/master/specs/validator/0_beacon-chain-validator.md
 
- 
+ 12 validator shuffling alg
+
+[swap-or-not](https://github.com/ethereum/eth2.0-specs/pull/576)
